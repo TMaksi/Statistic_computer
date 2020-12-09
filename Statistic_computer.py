@@ -1,5 +1,4 @@
 import psutil
-import re
 import time
 
 TEMPLATES = {
@@ -10,8 +9,8 @@ TEMPLATES = {
         'total': 'Размер файла подкачки: {:.4} ГБ\n'
     },
     'disks': {
-        'yes': 'Диск {}, \n\topts: {},\n\tТип файловой системы: {}, \n\tРазмер: {:.4} ГБ, \n\tЗанято: {:.4} ГБ, {:.4}%, \n\tСвободно: {:.4}ГБ\n',
-        'no' : 'Диск {}, \n\topts: {}\n'
+        'yes': 'Диск {} \n\topts: {},\n\tТип файловой системы: {}, \n\tРазмер: {:.4} ГБ, \n\tЗанято: {:.4} ГБ, {:.4}%, \n\tСвободно: {:.4}ГБ\n',
+        'no' : 'Диск {} \n\topts: {}\n'
     },
     # pid, name, status, username, create_time
     'process': '{:<6}{:<40}{:<10}{:<30}{:<20}',
@@ -38,9 +37,7 @@ def get_disks():
             'usage': {}
         }
     for disk in psutil.disk_partitions():
-        s = re.match(r'.*([:\\/]?[a-z|A-Z]+[:\\/]?).*', disk.device)
-        s = s.group(1)
-        res['diskpart']['device'].append(s)
+        res['diskpart']['device'].append(disk.device[:2])
         res['diskpart']['fstype'].append(disk.fstype)
         res['diskpart']['opts'].append(disk.opts)
     for i, disk in enumerate(res['diskpart']['device']):
@@ -95,7 +92,6 @@ def show():
         print(part_str)
     # Представление данных о процессах
     process = get_process()
-    
     print('{:^6}{:^40}{:^10}{:^30}{:^20}'.format('pid', 'name', 'status', 'username', 'create_time'))
     print(' ' * 112)
     for i in process:
